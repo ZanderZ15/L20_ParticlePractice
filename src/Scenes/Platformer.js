@@ -1,16 +1,21 @@
 class Platformer extends Phaser.Scene {
     constructor() {
         super("platformerScene");
+        
     }
 
     init() {
         // variables and settings
-        this.ACCELERATION = 400;
-        this.DRAG = 500;    // DRAG < ACCELERATION = icy slide
+        this.ACCELERATION = 800;
+        this.maxX = 300;
+        this.DRAG = 1000;    // DRAG < ACCELERATION = icy slide
         this.physics.world.gravity.y = 1500;
         this.JUMP_VELOCITY = -600;
+        this.maxY = 600;
         this.PARTICLE_VELOCITY = 50;
         this.SCALE = 2.0;
+        
+        
     }
 
     create() {
@@ -53,26 +58,53 @@ class Platformer extends Phaser.Scene {
         // TODO: put water bubble particle effect here
         // It's OK to have it start running
         ////////////////////
+        
 
+        for (let water of this.waterTiles) {
+            //console.log(water.x);
+            this.createwater(water.x*18 + 8, water.y*18);
+        }
 
         // set up player avatar
         my.sprite.player = this.physics.add.sprite(30, 345, "platformer_characters", "tile_0000.png");
         my.sprite.player.setCollideWorldBounds(true);
+        my.sprite.player.setMaxVelocity(this.maxX, this.maxY);
 
         // Enable collision handling
         this.physics.add.collider(my.sprite.player, this.groundLayer);
 
         // TODO: create coin collect particle effect here
         // Important: make sure it's not running
+        my.vfx.collect = this.add.particles(-100, -100, "kenny-particles", {
+            frame: ['star_08.png'],
+            
+            random: false, //Ranodmizes sprites shown
+            scale: {start: .3, end: 0.1},
+            rotaion: {start: 0, end: 45},
+            maxAliveParticles: 1, //Limits total particles
+            lifespan: 250,
+            gravityY: -100, //Makes float up if negative
+            alpha: {start: 1, end: 0.1},
+            duration: 250,
+            repeat: 0
+        });
+
+        my.vfx.collect.stop();
+        
 
 
         // Coin collision handler
         this.physics.add.overlap(my.sprite.player, this.coinGroup, (obj1, obj2) => {
-            obj2.destroy(); // remove coin on overlap
+            
             ////////////////////
             // TODO: start the coin collect particle effect here
             ////////////////////
-
+            my.vfx.collect.x = obj2.x;
+            my.vfx.collect.y = obj2.y;
+            my.vfx.collect.start();
+            
+            
+            obj2.destroy(); // remove coin on overlap
         });
 
         // set up Phaser-provided cursor key input
@@ -132,4 +164,20 @@ class Platformer extends Phaser.Scene {
             this.scene.restart();
         }
     }
+    createwater (x, y) {
+            return this.add.particles(x, y, "kenny-particles", {
+            frame: ['dirt_01.png', 'dirt_02.png', 'dirt_03.png'],
+            
+            random: true, //Ranodmizes sprites shown
+            scale: {start: 0.01, end: 0.05},
+            rotaion: 0,
+            maxAliveParticles: 50, //Limits total particles
+            lifespan: 300,
+            gravityY: -500, //Makes float up if negative
+            alpha: {start: 1, end: 0.1},
+            duration: -1,
+            repeat: 0,
+            tint: 0///////////
+            });
+        }
 }

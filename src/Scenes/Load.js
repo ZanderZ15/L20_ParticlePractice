@@ -26,6 +26,9 @@ class Load extends Phaser.Scene {
         // The multiatlas was created using TexturePacker and the Kenny
         // Particle Pack asset pack.
         this.load.multiatlas("kenny-particles", "kenny-particles.json");
+
+        //this.load.image("collect", "star_08.png");
+        //let collect = this.add.sprite(100, 100, "collect");
     }
 
     create() {
